@@ -3,3 +3,11 @@
 -I
 /usr/local/pspdev/psp/include
 -stdlib=libstdc++
+-I
+/usr/local/pspdev/psp/sdk/include
+-I
+/usr/local/pspdev/psp/sdk/include/netinet
+-I
+/usr/local/pspdev/psp/lib
+-I
+/usr/local/pspdev/lib
