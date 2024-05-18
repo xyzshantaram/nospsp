@@ -1,0 +1,3 @@
+[submodule "wic"]
+	path = wic
+	url = https://github.com/cjhdev/wic
