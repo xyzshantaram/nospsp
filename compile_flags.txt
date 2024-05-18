@@ -1,0 +1,5 @@
+-isystem
+/usr/local/pspdev/psp/sdk/include
+-I
+/usr/local/pspdev/psp/include
+-stdlib=libstdc++

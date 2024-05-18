@@ -1,0 +1,5 @@
+IndentWidth: 4
+SpaceInEmptyBlock: false
+SpaceInEmptyParentheses: false
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
