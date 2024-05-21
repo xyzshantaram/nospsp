@@ -49,6 +49,7 @@
 #ifndef GLIB2D_H
 #define GLIB2D_H
 
+#include <pspgu.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -81,7 +82,7 @@ extern "C" {
  */
 #define USE_PNG
 #define USE_JPEG
-//#define USE_VFPU
+// #define USE_VFPU
 
 /**
  * \def G2D_SCR_W
@@ -106,7 +107,11 @@ extern "C" {
  * This macro creates a g2dColor from 4 values, red, green, blue and alpha.
  * Input range is from 0 to 255.
  */
-#define G2D_RGBA(r, g, b, a) ((r)|((g)<<8)|((b)<<16)|((a)<<24))
+#define G2D_RGBA(r, g, b, a) ((r) | ((g) << 8) | ((b) << 16) | ((a) << 24))
+
+#define G2D_HEX(hex)                                                           \
+    (((hex) & 0xFF000000) >> 24) | (((hex) & 0x00FF0000) >> 8) |               \
+        (((hex) & 0x0000FF00) << 8) | (((hex) & 0x000000FF) << 24)
 
 /**
  * \def G2D_GET_R(color)
@@ -124,8 +129,8 @@ extern "C" {
  * \def G2D_GET_A(color)
  * \brief Get alpha channel value from a g2dColor.
  */
-#define G2D_GET_R(color) (((color)      ) & 0xFF)
-#define G2D_GET_G(color) (((color) >>  8) & 0xFF)
+#define G2D_GET_R(color) (((color)) & 0xFF)
+#define G2D_GET_G(color) (((color) >> 8) & 0xFF)
 #define G2D_GET_B(color) (((color) >> 16) & 0xFF)
 #define G2D_GET_A(color) (((color) >> 24) & 0xFF)
 
@@ -136,11 +141,11 @@ extern "C" {
  * This macro modulates the luminance & alpha of a g2dColor.
  * Input range is from 0 to 255.
  */
-#define G2D_MODULATE(color,luminance,alpha) \
-    G2D_RGBA((int)(luminance) * G2D_GET_R(color) / 255, \
-             (int)(luminance) * G2D_GET_G(color) / 255, \
-             (int)(luminance) * G2D_GET_B(color) / 255, \
-             (int)(alpha    ) * G2D_GET_A(color) / 255)
+#define G2D_MODULATE(color, luminance, alpha)                                  \
+    G2D_RGBA((int)(luminance) * G2D_GET_R(color) / 255,                        \
+             (int)(luminance) * G2D_GET_G(color) / 255,                        \
+             (int)(luminance) * G2D_GET_B(color) / 255,                        \
+             (int)(alpha) * G2D_GET_A(color) / 255)
 
 /**
  * \enum g2dColors
@@ -148,29 +153,28 @@ extern "C" {
  *
  * Primary, secondary, tertiary and grayscale colors are defined.
  */
-enum g2dColors
-{
+enum g2dColors {
     // Primary colors
-    RED             = 0xFF0000FF,
-    GREEN           = 0xFF00FF00,
-    BLUE            = 0xFFFF0000,
+    RED = 0xFF0000FF,
+    GREEN = 0xFF00FF00,
+    BLUE = 0xFFFF0000,
     // Secondary colors
-    CYAN            = 0xFFFFFF00,
-    MAGENTA         = 0xFFFF00FF,
-    YELLOW          = 0xFF00FFFF,
+    CYAN = 0xFFFFFF00,
+    MAGENTA = 0xFFFF00FF,
+    YELLOW = 0xFF00FFFF,
     // Tertiary colors
-    AZURE           = 0xFFFF7F00,
-    VIOLET          = 0xFFFF007F,
-    ROSE            = 0xFF7F00FF,
-    ORANGE          = 0xFF007FFF,
-    CHARTREUSE      = 0xFF00FF7F,
-    SPRING_GREEN    = 0xFF7FFF00,
+    AZURE = 0xFFFF7F00,
+    VIOLET = 0xFFFF007F,
+    ROSE = 0xFF7F00FF,
+    ORANGE = 0xFF007FFF,
+    CHARTREUSE = 0xFF00FF7F,
+    SPRING_GREEN = 0xFF7FFF00,
     // Grayscale
-    WHITE           = 0xFFFFFFFF,
-    LITEGRAY        = 0xFFBFBFBF,
-    GRAY            = 0xFF7F7F7F,
-    DARKGRAY        = 0xFF3F3F3F,
-    BLACK           = 0xFF000000
+    WHITE = 0xFFFFFFFF,
+    LITEGRAY = 0xFFBFBFBF,
+    GRAY = 0xFF7F7F7F,
+    DARKGRAY = 0xFF3F3F3F,
+    BLACK = 0xFF000000
 };
 
 /**
@@ -201,25 +205,23 @@ enum g2dColors
  * Change texture properties.
  * Can only be used with g2dTexLoad.
  */
-typedef enum
-{
+typedef enum {
     G2D_UP_LEFT,
     G2D_UP_RIGHT,
     G2D_DOWN_RIGHT,
     G2D_DOWN_LEFT,
     G2D_CENTER
 } g2dCoord_Mode;
-typedef enum
-{
+typedef enum {
     G2D_STRIP = 1 /**< Make a line strip. */
 } g2dLine_Mode;
-typedef enum
-{
-    G2D_VSYNC = 1 /**< Limit the FPS to 60 (synchronized with the screen).
-                       Better quality and less power consumption. */
+typedef enum {
+    G2D_VSYNC = 1,      /**< Limit the FPS to 60 (synchronized with the screen).
+                            Better quality and less power consumption. */
+    G2D_VSYNC_NO_FINISH /**< Same as G2D_VSYNC, does not call sceGuFinish() or
+                           sceGuSync() */
 } g2dFlip_Mode;
-typedef enum
-{
+typedef enum {
     G2D_SWIZZLE = 1 /**< Recommended. Use it to speedup rendering. */
 } g2dTex_Mode;
 
@@ -238,15 +240,14 @@ typedef unsigned int g2dColor;
  * \struct g2dTexture
  * \brief Texture structure.
  */
-typedef struct
-{
-    int tw;             /**< Real texture width. A power of two. */
-    int th;             /**< Real texture height. A power of two. */
-    int w;              /**< Texture width, as seen when drawing. */
-    int h;              /**< Texture height, as seen when drawing. */
-    float ratio;        /**< Width/height ratio. */
-    bool swizzled;      /**< Is the texture swizzled ? */
-    g2dColor *data;     /**< Pointer to raw data. */
+typedef struct {
+    int tw;         /**< Real texture width. A power of two. */
+    int th;         /**< Real texture height. A power of two. */
+    int w;          /**< Texture width, as seen when drawing. */
+    int h;          /**< Texture height, as seen when drawing. */
+    float ratio;    /**< Width/height ratio. */
+    bool swizzled;  /**< Is the texture swizzled ? */
+    g2dColor *data; /**< Pointer to raw data. */
 } g2dTexture;
 
 /**
@@ -394,7 +395,7 @@ void g2dPop();
  *
  * This function returns NULL on allocation fail.
  */
-g2dTexture* g2dTexCreate(int w, int h);
+g2dTexture *g2dTexCreate(int w, int h);
 
 /**
  * \brief Frees a texture & set its pointer to NULL.
@@ -417,7 +418,7 @@ void g2dTexFree(g2dTexture **tex);
  * textures (useless on small textures), pass G2D_SWIZZLE to enable it.
  * Texture supported up to 512*512 in size only (hardware limitation).
  */
-g2dTexture* g2dTexLoad(char path[], g2dTex_Mode mode);
+g2dTexture *g2dTexLoad(char path[], g2dTex_Mode mode);
 
 /**
  * \brief Resets the current coordinates.
@@ -489,7 +490,8 @@ void g2dSetCoordXYZRelative(float x, float y, float z);
 /**
  * \brief Use integer coordinates.
  * @param use false to desactivate (better look, by default),
-                            true to activate (can be useful when you have glitches).
+                            true to activate (can be useful when you have
+ glitches).
  *
  * This function must be called during object rendering.
  */
@@ -809,6 +811,8 @@ void g2dResetScissor();
  * Pixel draw will be skipped outside this rectangle.
  */
 void g2dSetScissor(int x, int y, int w, int h);
+
+void g2dDrawNetDialogBg(void);
 
 #ifdef __cplusplus
 }

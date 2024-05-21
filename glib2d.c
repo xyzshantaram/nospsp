@@ -555,10 +555,13 @@ void g2dReset() {
 void g2dFlip(g2dFlip_Mode mode) {
     if (scissor) g2dResetScissor();
 
-    sceGuFinish();
-    sceGuSync(0, 0);
+    if (mode & G2D_VSYNC) {
+        sceGuFinish();
+        sceGuSync(0, 0);
+    }
 
-    if (mode & G2D_VSYNC) sceDisplayWaitVblankStart();
+    if (mode & G2D_VSYNC || mode & G2D_VSYNC_NO_FINISH)
+        sceDisplayWaitVblankStart();
 
     g2d_disp_buffer.data = g2d_draw_buffer.data;
     g2d_draw_buffer.data = vabsptr(sceGuSwapBuffers());
@@ -1132,6 +1135,15 @@ void g2dResetScissor() {
     g2dSetScissor(0, 0, G2D_SCR_W, G2D_SCR_H);
 
     scissor = false;
+}
+
+void g2dDrawNetDialogBg(void) {
+    sceGuStart(GU_DIRECT, dlist);
+    sceGuClearColor(0xFF686868);
+    sceGuClearDepth(0);
+    sceGuClear(GU_COLOR_BUFFER_BIT | GU_DEPTH_BUFFER_BIT);
+    sceGuFinish();
+    sceGuSync(0, 0);
 }
 
 void g2dSetScissor(int x, int y, int w, int h) {
