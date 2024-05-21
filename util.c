@@ -1,4 +1,5 @@
 #include "util.h"
+#include "intraFont.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -100,5 +101,11 @@ void load_latin_fonts(intraFont *(*arr)[16]) {
         printf("Loading font %s\n", file);
         (*arr)[i] = intraFontLoad(file, 0);
         intraFontSetStyle((*arr)[i], 1.0f, WHITE, 0, 0.0f, 0);
+    }
+}
+
+void unload_fonts(intraFont *(*arr)[16]) {
+    for (int i = 0; i < 16; i++) {
+        if ((*arr)[i]) intraFontUnload((*arr)[i]);
     }
 }

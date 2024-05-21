@@ -189,5 +189,7 @@ int main() {
         g2dFlip(G2D_VSYNC);
     }
     g2dTerm();
+    unload_fonts(&latin_fonts);
+    intraFontShutdown();
     sceKernelExitGame();
 }

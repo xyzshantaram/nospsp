@@ -20,4 +20,5 @@ void stroke_circle(int cx, int cy, int r, g2dColor color);
 _Bool circle_rect_collision(int cx, int cy, int r, int rx, int ry, int w,
                             int h);
 void load_latin_fonts(intraFont *(*arr)[16]);
+void unload_fonts(intraFont *(*arr)[16]);
 #endif
