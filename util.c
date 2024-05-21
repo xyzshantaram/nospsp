@@ -1,4 +1,6 @@
 #include "util.h"
+#include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 int clamp(int val, int min, int max) {
@@ -95,7 +97,17 @@ _Bool circle_rect_collision(int cx, int cy, int r, int rx, int ry, int w,
     if (dx <= (w / 2)) return true;
     if (dy <= (h / 2)) return true;
 
-    int d_sq = (dx - w / 2) ^ 2 + (dy - h / 2) ^ 2;
+    int d_sq = pow(dx - (double)w / 2, 2) + pow(dy - (double)h / 2, 2);
+    return (d_sq < pow(r, 2));
+}
 
-    return (d_sq < (r ^ 2));
+void load_latin_fonts(intraFont *(*arr)[16]) {
+    char file[40];
+    int i;
+    for (i = 0; i < 16; i++) {
+        sprintf(file, FONT_LOCATION, i);
+        printf("Loading font %s\n", file);
+        (*arr)[i] = intraFontLoad(file, 0);
+        intraFontSetStyle((*arr)[i], 1.0f, WHITE, 0, 0.0f, 0);
+    }
 }

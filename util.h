@@ -2,6 +2,7 @@
 #define __UTIL_H__
 
 #include "glib2d.h"
+#include "intraFont.h"
 #include <stdint.h>
 
 #define FONT_LOCATION "flash0:/font/ltn%d.pgf"
@@ -19,4 +20,5 @@ void stroke_circle(int cx, int cy, int r, g2dColor color);
 g2dColor rgba(uint32_t color);
 _Bool circle_rect_collision(int cx, int cy, int r, int rx, int ry, int w,
                             int h);
+void load_latin_fonts(intraFont *(*arr)[16]);
 #endif
