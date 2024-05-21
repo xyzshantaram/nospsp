@@ -139,6 +139,11 @@ net_failed:
     return 0;
 }
 
+typedef enum game_state_t {
+    GS_EXITED = 0,
+    GS_RUNNING,
+} GameState;
+
 int main() {
     callbacks_setup();
     g2dInit();
@@ -168,7 +173,9 @@ int main() {
     int dx = 2;
     InputState s;
 
-    while (1) {
+    GameState state = GS_RUNNING;
+
+    while (state != GS_EXITED) {
         // Framelimit code
         u32 res = sceRtcGetTickResolution();
         double min_delta = (float)res / TARGET_FPS;
@@ -183,7 +190,7 @@ int main() {
         if (cx <= cr / 2 || cx >= PSP_SCR_WIDTH - cr / 2) dx *= -1;
         read_controls(&s);
         if (s.bstates.Buttons & PSP_CTRL_CIRCLE) {
-            break;
+            state = GS_EXITED;
         }
 
         g2dFlip(G2D_VSYNC);
