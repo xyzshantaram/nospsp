@@ -1,20 +1,25 @@
-#include "gutil.h"
+#include "callbacks.h"
+#include "glib2d.h"
+#include "intraFont.h"
+#include "util.h"
 #include <pspctrl.h>
 #include <pspdisplay.h>
+#include <pspge.h>
 #include <pspgu.h>
 #include <pspkernel.h>
 #include <pspnet.h>
 #include <pspnet_apctl.h>
 #include <pspnet_inet.h>
+#include <psprtc.h>
 #include <psputility.h>
 #include <stdio.h>
 #include <string.h>
 
-static char disp_list[0x10000] __attribute__((aligned(64)));
+#define TARGET_FPS 60
 
 PSP_MODULE_INFO("NostrStation Portable", 0, 1, 1);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_KB(-1024);
+PSP_HEAP_SIZE_KB(-16384);
 PSP_HEAP_THRESHOLD_SIZE_KB(1024);
 PSP_MAIN_THREAD_STACK_SIZE_KB(1024);
 
@@ -37,15 +42,6 @@ static void ConfigureDialog(pspUtilityDialogCommon *dialog,
     dialog->soundThread = 0x10;
 }
 
-static void drawDialogBackground(void) {
-    sceGuStart(GU_DIRECT, disp_list);
-    sceGuClearColor(0xFF686868);
-    sceGuClearDepth(0);
-    sceGuClear(GU_COLOR_BUFFER_BIT | GU_DEPTH_BUFFER_BIT);
-    sceGuFinish();
-    sceGuSync(0, 0);
-}
-
 int psp_DisplayNetDialog(void) {
     int ret = 0, done = 0;
     pspUtilityNetconfData data;
@@ -65,8 +61,7 @@ int psp_DisplayNetDialog(void) {
     }
 
     do {
-        drawDialogBackground();
-
+        g2dDrawNetDialogBg();
         done = sceUtilityNetconfGetStatus();
         switch (done) {
         case PSP_UTILITY_DIALOG_VISIBLE:
@@ -80,10 +75,10 @@ int psp_DisplayNetDialog(void) {
                 printf("sceUtilityNetconfShutdownStart() failed: 0x%08x", ret);
             }
             break;
+        default:
+            break;
         }
-
-        sceDisplayWaitVblankStart();
-        sceGuSwapBuffers();
+        g2dFlip(G2D_VSYNC_NO_FINISH);
     } while (done != PSP_UTILITY_DIALOG_NONE);
 
     done = PSP_NET_APCTL_STATE_DISCONNECTED;
@@ -96,24 +91,25 @@ int psp_DisplayNetDialog(void) {
 }
 
 typedef struct input_state_t {
-    SceCtrlLatch latch;
-    SceCtrlData data;
+    SceCtrlLatch changed;
+    SceCtrlData bstates;
 } InputState;
 
-InputState read_controls() {
+int read_controls(InputState *s) {
     SceCtrlLatch latch;
-    sceCtrlReadLatch(&latch);
+    int ret = sceCtrlReadLatch(&latch);
+    if (ret < 0) goto exit;
     SceCtrlData data;
-    sceCtrlReadBufferPositive(&data, 1);
+    ret = sceCtrlReadBufferPositive(&data, 1);
+    if (ret < 0) goto exit;
 
-    InputState s = {.latch = latch, .data = data};
-    return s;
+    s->changed = latch;
+    s->bstates = data;
+exit:
+    return ret;
 }
 
 int user_main(SceSize args, void *argp) {
-    sceUtilityLoadNetModule(PSP_NET_MODULE_COMMON);
-    sceUtilityLoadNetModule(PSP_NET_MODULE_INET);
-
     int ret = 0;
 
     if ((ret = sceNetInit(128 * 1024, 42, 4 * 1024, 42, 4 * 1024)) < 0) {
@@ -132,15 +128,6 @@ int user_main(SceSize args, void *argp) {
     }
 
     psp_DisplayNetDialog();
-    printf("here\n");
-
-    while (1) {
-        InputState s = read_controls();
-        if (s.latch.uiBreak & PSP_CTRL_CIRCLE) {
-            break;
-        }
-    }
-
 apctl_failed:
     sceNetInetTerm();
 inet_failed:
@@ -153,8 +140,15 @@ net_failed:
 }
 
 int main() {
-    drawDialogBackground();
-    init_graphics();
+    callbacks_setup();
+    g2dInit();
+    intraFontInit();
+    intraFont *latin_fonts[16];
+    load_latin_fonts(&latin_fonts);
+
+    sceGeEdramSetSize(0x400000);
+    sceUtilityLoadNetModule(PSP_NET_MODULE_COMMON);
+    sceUtilityLoadNetModule(PSP_NET_MODULE_INET);
 
     SceUID thid = sceKernelCreateThread(
         "User Mode Thread", user_main,
@@ -165,6 +159,35 @@ int main() {
     // start user thread, then wait for it to do everything else
     sceKernelStartThread(thid, 0, NULL);
     sceKernelWaitThreadEnd(thid, NULL);
-    terminate_graphics();
+
+    u64 last_tick;
+    sceRtcGetCurrentTick(&last_tick);
+    int cr = 20;
+    int cx = cr / 2;
+    int cy = PSP_SCR_HEIGHT / 2;
+    int dx = 2;
+    InputState s;
+
+    while (1) {
+        // Framelimit code
+        u32 res = sceRtcGetTickResolution();
+        double min_delta = (float)res / TARGET_FPS;
+        u64 this_tick;
+        sceRtcGetCurrentTick(&this_tick);
+        double delta = this_tick - last_tick;
+        if (delta < min_delta) continue;
+        last_tick = this_tick;
+        g2dClear(G2D_HEX(0x007cdfff));
+        stroke_circle(cx, cy, cr, G2D_HEX(0x27ffffff));
+        cx += dx;
+        if (cx <= cr / 2 || cx >= PSP_SCR_WIDTH - cr / 2) dx *= -1;
+        read_controls(&s);
+        if (s.bstates.Buttons & PSP_CTRL_CIRCLE) {
+            break;
+        }
+
+        g2dFlip(G2D_VSYNC);
+    }
+    g2dTerm();
     sceKernelExitGame();
 }
