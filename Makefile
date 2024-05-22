@@ -1,7 +1,7 @@
 TARGET = NostrPSP
 BUILD_PRX = 1
 
-OBJS = main.o glib2d.o callbacks.o main.o util.o
+OBJS = main.o glib2d.o callbacks.o util.o microui.o
 LIBS = -lintrafont_psp -ljpeg -lpng -lz -lpspgum -lpspgu -lpsprtc -lm -lpspvram
 
 CFLAGS = -O2 -G0 -Wall
