@@ -17,8 +17,9 @@ void fill_rect(int x, int y, int w, int h, g2dColor color);
 void stroke_rect(int x, int y, int w, int h, g2dColor color);
 void fill_circle(int x, int y, int r, g2dColor color);
 void stroke_circle(int cx, int cy, int r, g2dColor color);
+void add_point(int x, int y, g2dColor color);
 _Bool circle_rect_collision(int cx, int cy, int r, int rx, int ry, int w,
                             int h);
-void load_latin_fonts(intraFont *(*arr)[16]);
-void unload_fonts(intraFont *(*arr)[16]);
+void load_latin_font(intraFont **fnt, int idx);
+void unload_font(intraFont **fnt);
 #endif

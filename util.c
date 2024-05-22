@@ -93,19 +93,11 @@ _Bool circle_rect_collision(int cx, int cy, int r, int rx, int ry, int w,
     return (d_sq < pow(r, 2));
 }
 
-void load_latin_fonts(intraFont *(*arr)[16]) {
+void load_latin_font(intraFont **fnt, int idx) {
     char file[40];
-    int i;
-    for (i = 0; i < 16; i++) {
-        sprintf(file, FONT_LOCATION, i);
-        printf("Loading font %s\n", file);
-        (*arr)[i] = intraFontLoad(file, 0);
-        intraFontSetStyle((*arr)[i], 1.0f, WHITE, 0, 0.0f, 0);
-    }
+    sprintf(file, FONT_LOCATION, idx);
+    *fnt = intraFontLoad(file, 0);
+    intraFontSetStyle(*fnt, 1.0f, WHITE, 0, 0.0f, 0);
 }
 
-void unload_fonts(intraFont *(*arr)[16]) {
-    for (int i = 0; i < 16; i++) {
-        if ((*arr)[i]) intraFontUnload((*arr)[i]);
-    }
-}
+void unload_font(intraFont **fnt) { intraFontUnload(*fnt); }
