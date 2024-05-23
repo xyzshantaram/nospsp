@@ -94,20 +94,66 @@ int psp_DisplayNetDialog(void) {
 }
 
 typedef struct input_state_t {
-    SceCtrlLatch changed;
-    SceCtrlData bstates;
+    int mouse_x;
+    int mouse_y;
+    uint8_t last_mouse_x;
+    uint8_t last_mouse_y;
 } InputState;
 
-int read_controls(InputState *s) {
+#define MOUSE_DEADZONE 20
+#define MOUSE_MAX_SPEED 8
+#define MOUSE_SPEED_MODIFIER (127 / MOUSE_MAX_SPEED)
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+#define CLAMP(v, l, u) (MAX((l), MIN((v), (u))))
+
+int mouse_get_delta(uint8_t axis) {
+    int delta_val = (int)axis - 127;
+    int distance_without_deadzone =
+        delta_val + ((delta_val < -MOUSE_DEADZONE) ? 1 : -1) * MOUSE_DEADZONE;
+
+    if (delta_val > -MOUSE_DEADZONE && delta_val < MOUSE_DEADZONE) {
+        distance_without_deadzone = 0;
+    }
+
+    return distance_without_deadzone / MOUSE_SPEED_MODIFIER;
+}
+
+int process_controls(mu_Context *ctx, InputState *s) {
     SceCtrlLatch latch;
     int ret = sceCtrlReadLatch(&latch);
     if (ret < 0) goto exit;
+
     SceCtrlData data;
     ret = sceCtrlReadBufferPositive(&data, 1);
     if (ret < 0) goto exit;
 
-    s->changed = latch;
-    s->bstates = data;
+    int dx = mouse_get_delta(data.Lx);
+    int dy = mouse_get_delta(data.Ly);
+    if (!(data.Buttons & PSP_CTRL_TRIANGLE)) {
+        s->mouse_x += dx;
+        s->mouse_y += dy;
+        s->mouse_x = CLAMP(s->mouse_x, 0, PSP_SCR_WIDTH);
+        s->mouse_y = CLAMP(s->mouse_y, 0, PSP_SCR_HEIGHT);
+    } else {
+        mu_input_scroll(ctx, dx, dy);
+    }
+
+    if (s->mouse_x != s->last_mouse_x || s->mouse_y != s->last_mouse_y) {
+        mu_input_mousemove(ctx, s->mouse_x, s->mouse_y);
+    }
+
+    s->last_mouse_x = s->mouse_x;
+    s->last_mouse_y = s->mouse_y;
+
+    if (latch.uiBreak & PSP_CTRL_CROSS) {
+        mu_input_mouseup(ctx, s->mouse_x, s->mouse_y, MU_MOUSE_LEFT);
+    }
+
+    if (latch.uiMake & PSP_CTRL_CROSS) {
+        mu_input_mousedown(ctx, s->mouse_x, s->mouse_y, MU_MOUSE_LEFT);
+    }
+
 exit:
     return ret;
 }
