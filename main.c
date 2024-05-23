@@ -1,18 +1,24 @@
 #include "callbacks.h"
 #include "glib2d.h"
+#include "icons/check.c"
+#include "icons/close.c"
+#include "icons/collapsed.c"
+#include "icons/cursor.c"
+#include "icons/expanded.c"
+#include "icons/white.c"
 #include "intraFont.h"
+#include "microui.h"
 #include "util.h"
 #include <pspctrl.h>
-#include <pspdisplay.h>
-#include <pspge.h>
-#include <pspgu.h>
-#include <pspkernel.h>
+#include <pspmoduleinfo.h>
 #include <pspnet.h>
 #include <pspnet_apctl.h>
 #include <pspnet_inet.h>
-#include <psprtc.h>
+#include <pspthreadman.h>
+#include <psptypes.h>
 #include <psputility.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define TARGET_FPS 60
