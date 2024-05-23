@@ -2,7 +2,7 @@ TARGET = NostrPSP
 BUILD_PRX = 1
 
 OBJS = main.o glib2d.o callbacks.o util.o microui.o
-LIBS = -lintrafont_psp -ljpeg -lpng -lz -lpspgum -lpspgu -lpsprtc -lm -lpspvram
+LIBS = -lm -ljpeg -lpng -lz -lintrafont_psp -lpspgum -lpspgu -lpsprtc -lpspvram -lpspnet -lpspnet_apctl
 
 CFLAGS = -O2 -G0 -Wall
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
