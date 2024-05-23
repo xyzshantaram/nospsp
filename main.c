@@ -270,7 +270,7 @@ void mu_demo(mu_Context *ctx) {
 
 void handle_mu_text(mu_Command *cmd) {
     mu_Color c = cmd->text.color;
-    iF_draw_text(cmd->text.pos.x, cmd->text.pos.y + 6, cmd->text.str,
+    iF_draw_text(cmd->text.pos.x, cmd->text.pos.y + 4, cmd->text.str,
                  G2D_RGBA(c.r, c.g, c.b, c.a));
 }
 
