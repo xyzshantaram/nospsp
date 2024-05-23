@@ -5,7 +5,6 @@
 #include "icons/collapsed.c"
 #include "icons/cursor.c"
 #include "icons/expanded.c"
-#include "icons/white.c"
 #include "intraFont.h"
 #include "microui.h"
 #include "util.h"
