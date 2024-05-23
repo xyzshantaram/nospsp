@@ -223,6 +223,44 @@ void draw_icon(uint8_t *icon, int x, int y, uint8_t w, uint8_t h, mu_Color c) {
     g2dEnd();
 }
 
+void handle_mu_text(mu_Command *cmd) {
+    mu_Color c = cmd->text.color;
+    iF_draw_text(cmd->text.pos.x, cmd->text.pos.y + 6, cmd->text.str,
+                 G2D_RGBA(c.r, c.g, c.b, c.a));
+}
+
+void handle_mu_rect(mu_Command *cmd) {
+    mu_Color c = cmd->rect.color;
+    fill_rect(cmd->rect.rect.x, cmd->rect.rect.y, cmd->rect.rect.w,
+              cmd->rect.rect.h, G2D_RGBA(c.r, c.g, c.b, c.a));
+}
+
+void handle_mu_icon(mu_Command *cmd) {
+    int x = cmd->icon.rect.x;
+    int y = cmd->icon.rect.y;
+    mu_Color color = cmd->icon.color;
+    switch (cmd->icon.id) {
+    case MU_ICON_CHECK:
+        draw_icon(MU_ICON_CHECK_ATL, x, y, w_MU_ICON_CHECK_ATL,
+                  h_MU_ICON_CHECK_ATL, color);
+        break;
+    case MU_ICON_CLOSE:
+        draw_icon(MU_ICON_CLOSE_ATL, x, y, w_MU_ICON_CLOSE_ATL,
+                  h_MU_ICON_CLOSE_ATL, color);
+        break;
+    case MU_ICON_EXPANDED:
+        draw_icon(MU_ICON_EXPANDED_ATL, x, y, w_MU_ICON_EXPANDED_ATL,
+                  h_MU_ICON_EXPANDED_ATL, color);
+    case MU_ICON_COLLAPSED:
+        draw_icon(MU_ICON_COLLAPSED_ATL, x, y, w_MU_ICON_COLLAPSED_ATL,
+                  h_MU_ICON_COLLAPSED_ATL, color);
+    case MU_ICON_MAX:
+        draw_icon(MU_ICON_WHITE_ATL, x, y, w_MU_ICON_WHITE_ATL,
+                  h_MU_ICON_WHITE_ATL, color);
+        break;
+    }
+}
+
 void draw_cursor(InputState *s) {
     mu_Color c = {0xff, 0xff, 0xff, 0xff};
     draw_icon(ICON_MOUSE_ATL, s->mouse_x - w_ICON_MOUSE_ATL / 2,
