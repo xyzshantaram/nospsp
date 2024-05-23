@@ -223,6 +223,13 @@ void draw_icon(uint8_t *icon, int x, int y, uint8_t w, uint8_t h, mu_Color c) {
     g2dEnd();
 }
 
+void draw_cursor(InputState *s) {
+    mu_Color c = {0xff, 0xff, 0xff, 0xff};
+    draw_icon(ICON_MOUSE_ATL, s->mouse_x - w_ICON_MOUSE_ATL / 2,
+              s->mouse_y - h_ICON_MOUSE_ATL / 2, w_ICON_MOUSE_ATL,
+              h_ICON_MOUSE_ATL, c);
+}
+
 void mainloop(GameState *state, InputState *s, mu_Context *ctx) {
     mu_Command *cmd = NULL;
     g2dClear(G2D_HEX(0x007cdfff));
