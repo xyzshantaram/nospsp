@@ -22,16 +22,13 @@
 #include <string.h>
 
 #define TARGET_FPS 60
+#define PSP_SCR_WIDTH 480
+#define PSP_SCR_HEIGHT 272
 
 PSP_MODULE_INFO("NostrStation Portable", 0, 1, 1);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
-PSP_HEAP_SIZE_KB(-16384);
-PSP_HEAP_THRESHOLD_SIZE_KB(1024);
 PSP_MAIN_THREAD_STACK_SIZE_KB(1024);
-
-#define PSP_BUF_WIDTH (512)
-#define PSP_SCR_WIDTH (480)
-#define PSP_SCR_HEIGHT (272)
+PSP_HEAP_SIZE_KB(-4096);
 
 static void ConfigureDialog(pspUtilityDialogCommon *dialog,
                             size_t dialog_size) {
