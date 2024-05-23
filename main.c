@@ -146,6 +146,37 @@ typedef enum game_state_t {
     GS_EXITED = 0,
     GS_RUNNING,
 } GameState;
+
+intraFont *fnt;
+
+void iF_draw_text(float xpos, float ypos, const char *msg, uint32_t color) {
+    if (!msg) return;
+    intraFontSetStyle(fnt, 0.6f, color, 0, 0.0f, 0);
+    intraFontPrint(fnt, xpos, ypos, msg);
+}
+
+static int text_width(mu_Font fnt, const char *text, int len) {
+    if (len == -1) {
+        len = strlen(text);
+    }
+    return intraFontMeasureTextEx(fnt, text, len);
+}
+
+static int text_height(mu_Font font) { return fnt->size; }
+
+void draw_icon(uint8_t *icon, int x, int y, uint8_t w, uint8_t h, mu_Color c) {
+    g2dBeginPoints();
+    for (int i = 0; i < w; i++) {
+        for (int j = 0; j < h; j++) {
+            int b = icon[i + w * j];
+            add_point(x + i + w / 4, y + j + h / 4,
+                      G2D_RGBA((c.r * b) / 0xff, (c.g * b) / 0xff,
+                               (c.b * b) / 0xff, (c.a * b) / 0xff));
+        }
+    }
+    g2dEnd();
+}
+
 void mainloop(GameState *state, InputState *s, mu_Context *ctx) {
     mu_Command *cmd = NULL;
     g2dClear(G2D_HEX(0x007cdfff));
