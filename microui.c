@@ -414,6 +414,10 @@ void mu_input_text(mu_Context *ctx, const char *text) {
 mu_Command *mu_push_command(mu_Context *ctx, int type, int size) {
     mu_Command *cmd =
         (mu_Command *)(ctx->command_list.items + ctx->command_list.idx);
+    // https://github.com/rxi/microui/issues/19#issuecomment-979063923
+    const int al = sizeof(void *) - 1;
+    size = (size + al) & ~al;
+    expect(size % sizeof(void *) == 0);
     expect(ctx->command_list.idx + size < MU_COMMANDLIST_SIZE);
     cmd->base.type = type;
     cmd->base.size = size;
