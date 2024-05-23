@@ -280,29 +280,39 @@ void handle_mu_rect(mu_Command *cmd) {
               cmd->rect.rect.h, G2D_RGBA(c.r, c.g, c.b, c.a));
 }
 
+#define SET_ICON(icon_type)                                                    \
+    do {                                                                       \
+        w = w_##icon_type##_ATL;                                               \
+        h = h_##icon_type##_ATL;                                               \
+        icon = icon_type##_ATL;                                                \
+    } while (0)
+
 void handle_mu_icon(mu_Command *cmd) {
-    int x = cmd->icon.rect.x;
-    int y = cmd->icon.rect.y;
-    mu_Color color = cmd->icon.color;
+    int w, h;
+    uint8_t *icon = NULL;
     switch (cmd->icon.id) {
-    case MU_ICON_CHECK:
-        draw_icon(MU_ICON_CHECK_ATL, x, y, w_MU_ICON_CHECK_ATL,
-                  h_MU_ICON_CHECK_ATL, color);
+    case MU_ICON_CHECK: {
+        SET_ICON(MU_ICON_CHECK);
         break;
-    case MU_ICON_CLOSE:
-        draw_icon(MU_ICON_CLOSE_ATL, x, y, w_MU_ICON_CLOSE_ATL,
-                  h_MU_ICON_CLOSE_ATL, color);
+    }
+    case MU_ICON_CLOSE: {
+        SET_ICON(MU_ICON_CLOSE);
         break;
-    case MU_ICON_EXPANDED:
-        draw_icon(MU_ICON_EXPANDED_ATL, x, y, w_MU_ICON_EXPANDED_ATL,
-                  h_MU_ICON_EXPANDED_ATL, color);
+    }
+    case MU_ICON_EXPANDED: {
+        SET_ICON(MU_ICON_EXPANDED);
+        break;
+    }
     case MU_ICON_COLLAPSED:
-        draw_icon(MU_ICON_COLLAPSED_ATL, x, y, w_MU_ICON_COLLAPSED_ATL,
-                  h_MU_ICON_COLLAPSED_ATL, color);
-    case MU_ICON_MAX:
-        draw_icon(MU_ICON_WHITE_ATL, x, y, w_MU_ICON_WHITE_ATL,
-                  h_MU_ICON_WHITE_ATL, color);
+        SET_ICON(MU_ICON_COLLAPSED);
         break;
+    default:
+        break;
+    }
+
+    if (icon) {
+        mu_Rect rect = cmd->icon.rect;
+        draw_icon(icon, rect.x, rect.y, w, h, cmd->icon.color);
     }
 }
 
