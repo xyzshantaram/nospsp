@@ -158,7 +158,7 @@ exit:
     return ret;
 }
 
-int user_main(SceSize args, void *argp) {
+int net_thread(SceSize args, void *argp) {
     int ret = 0;
 
     if ((ret = sceNetInit(128 * 1024, 42, 4 * 1024, 42, 4 * 1024)) < 0) {
