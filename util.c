@@ -97,7 +97,7 @@ void load_latin_font(intraFont **fnt, int idx) {
     char file[40];
     sprintf(file, FONT_LOCATION, idx);
     *fnt = intraFontLoad(file, 0);
-    intraFontSetStyle(*fnt, 1.0f, WHITE, 0, 0.0f, 0);
+    intraFontSetStyle(*fnt, 0.6f, WHITE, 0, 0.0f, 0);
 }
 
 void unload_font(intraFont **fnt) { intraFontUnload(*fnt); }
