@@ -146,60 +146,80 @@ typedef enum game_state_t {
     GS_EXITED = 0,
     GS_RUNNING,
 } GameState;
+void mainloop(GameState *state, InputState *s, mu_Context *ctx) {
+    mu_Command *cmd = NULL;
+    g2dClear(G2D_HEX(0x007cdfff));
+    mu_begin(ctx);
+    process_controls(ctx, s);
+    mu_demo(ctx);
+    mu_end(ctx);
+
+    while (mu_next_command(ctx, &cmd)) {
+        switch (cmd->type) {
+        case MU_COMMAND_TEXT:
+            handle_mu_text(cmd);
+            break;
+        case MU_COMMAND_RECT:
+            handle_mu_rect(cmd);
+            break;
+        case MU_COMMAND_ICON:
+            handle_mu_icon(cmd);
+            break;
+        default:
+            break;
+        case MU_COMMAND_CLIP: {
+            mu_Rect r = cmd->clip.rect;
+            g2dSetScissor(r.x, r.y, r.w, r.h);
+            break;
+        }
+        }
+    }
+
+    draw_cursor(s);
+    g2dFlip(G2D_VSYNC);
+}
 
 int main() {
-    callbacks_setup();
     g2dInit();
     intraFontInit();
-    intraFont *latin_fonts[16];
-    load_latin_fonts(&latin_fonts);
+    load_latin_font(&fnt, 0);
+    printf("loaded font %s\n", fnt->filename);
 
-    sceGeEdramSetSize(0x400000);
+    sceCtrlSetSamplingCycle(0);
+    sceCtrlSetSamplingMode(PSP_CTRL_MODE_ANALOG);
+
+    callbacks_setup();
+
     sceUtilityLoadNetModule(PSP_NET_MODULE_COMMON);
     sceUtilityLoadNetModule(PSP_NET_MODULE_INET);
 
-    SceUID thid = sceKernelCreateThread(
-        "User Mode Thread", user_main,
+    SceUID nthread = sceKernelCreateThread(
+        "User Mode Thread", net_thread,
         0x11,       // default priority
         512 * 1024, // stack size (256KB is regular default)
         PSP_THREAD_ATTR_USER, NULL);
 
     // start user thread, then wait for it to do everything else
-    sceKernelStartThread(thid, 0, NULL);
-    sceKernelWaitThreadEnd(thid, NULL);
-
-    u64 last_tick;
-    sceRtcGetCurrentTick(&last_tick);
-    int cr = 20;
-    int cx = cr / 2;
-    int cy = PSP_SCR_HEIGHT / 2;
-    int dx = 2;
-    InputState s;
+    sceKernelStartThread(nthread, 0, NULL);
+    sceKernelWaitThreadEnd(nthread, NULL);
 
     GameState state = GS_RUNNING;
 
-    while (state != GS_EXITED) {
-        // Framelimit code
-        u32 res = sceRtcGetTickResolution();
-        double min_delta = (float)res / TARGET_FPS;
-        u64 this_tick;
-        sceRtcGetCurrentTick(&this_tick);
-        double delta = this_tick - last_tick;
-        if (delta < min_delta) continue;
-        last_tick = this_tick;
-        g2dClear(G2D_HEX(0x007cdfff));
-        stroke_circle(cx, cy, cr, G2D_HEX(0x27ffffff));
-        cx += dx;
-        if (cx <= cr / 2 || cx >= PSP_SCR_WIDTH - cr / 2) dx *= -1;
-        read_controls(&s);
-        if (s.bstates.Buttons & PSP_CTRL_CIRCLE) {
-            state = GS_EXITED;
-        }
+    mu_Context *ctx = malloc(sizeof *ctx);
+    InputState *s = malloc(sizeof *s);
+    s->mouse_x = PSP_SCR_WIDTH / 2;
+    s->mouse_y = PSP_SCR_HEIGHT / 2;
+    s->last_mouse_x = 0;
+    s->last_mouse_y = 0;
+    mu_init(ctx);
+    ctx->text_width = text_width;
+    ctx->text_height = text_height;
 
-        g2dFlip(G2D_VSYNC);
+    while (state != GS_EXITED) {
+        mainloop(&state, s, ctx);
     }
-    g2dTerm();
-    unload_fonts(&latin_fonts);
-    intraFontShutdown();
+
+    free(ctx);
+    free(s);
     sceKernelExitGame();
 }
