@@ -131,4 +131,11 @@ void load_latin_font(intraFont **fnt, int idx) {
     intraFontSetStyle(*fnt, 0.6f, WHITE, 0, 0.0f, 0);
 }
 
+void iF_draw_text(intraFont *fnt, float xpos, float ypos, const char *msg,
+                  uint32_t color, float size) {
+    if (!msg) return;
+    intraFontSetStyle(fnt, size, color, 0, 0.0f, 0);
+    intraFontPrint(fnt, xpos, ypos, msg);
+}
+
 void unload_font(intraFont **fnt) { intraFontUnload(*fnt); }

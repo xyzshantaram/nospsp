@@ -1,6 +1,27 @@
 #include "controls.h"
 #include "icons/cursor.h"
+#include "intraFont.h"
 #include "util.h"
+
+// clang-format off
+const char keymaps[3][3][4] = {
+{
+    {' ', '-', '!', '?'}, 
+    {'y', 'c', 'b', 'p'}, 
+    {'@', '$', '(', ')'}
+    },
+{
+    {'r', 'd', 'l', 'u'}, 
+    {'e', 't', 'a', 'o'}, 
+    {'m', 'w', 'f', 'g'}
+    },
+{
+    {'k', 'v', 'j', 'x'}, 
+    {'i', 'n', 's', 'h'}, 
+    {'z', 'q', '.', ','}
+    }
+};
+// clang-format on
 
 void draw_cursor(InputState *s) {
     mu_Color c = {0xff, 0xff, 0xff, 0xff};
@@ -57,16 +78,16 @@ void render_keyboard(intraFont *fnt, bool shifted, uint8_t lx, uint8_t ly) {
             int ypos = y + j * side_b3 + 12;
             int color = 0xff555555;
             if (qx == i && qy == j) color = BLACK;
-            char *keys = keymaps[i][j];
+            const char *keys = keymaps[i][j];
 
             iF_draw_text(fnt, xpos + offset_half, ypos + offset_full,
-                         CH_TO_STR(keys[0]), color, 0.8f);
+                         CH_TO_STR(keys[0]), color, size);
             iF_draw_text(fnt, xpos, ypos + offset_half, CH_TO_STR(keys[1]),
-                         color, 0.8f);
+                         color, size);
             iF_draw_text(fnt, xpos + offset_half, ypos, CH_TO_STR(keys[2]),
-                         color, 0.8f);
+                         color, size);
             iF_draw_text(fnt, xpos + offset_full, ypos + offset_half,
-                         CH_TO_STR(keys[3]), color, 0.8f);
+                         CH_TO_STR(keys[3]), color, size);
         }
     }
 }

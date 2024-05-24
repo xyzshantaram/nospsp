@@ -1,8 +1,8 @@
 #ifndef __CONTROLS_H
 #define __CONTROLS_H
 
+#include "intraFont.h"
 #include "microui.h"
-#include "util.h"
 #include <pspctrl.h>
 #include <stdint.h>
 
@@ -18,25 +18,7 @@ typedef struct input_state_t {
     int is_keyboard_active;
 } InputState;
 
-// clang-format off
-char keymaps[3][3][4] = {
-{
-    {' ', '-', '!', '?'}, 
-    {'y', 'c', 'b', 'p'}, 
-    {'@', '$', '(', ')'}
-    },
-{
-    {'r', 'd', 'l', 'u'}, 
-    {'e', 't', 'a', 'o'}, 
-    {'m', 'w', 'f', 'g'}
-    },
-{
-    {'k', 'v', 'j', 'x'}, 
-    {'i', 'n', 's', 'h'}, 
-    {'z', 'q', '.', ','}
-    }
-};
-// clang-format on
+extern const char keymaps[3][3][4];
 
 int process_controls(mu_Context *ctx, InputState *s, intraFont *fnt);
 void draw_cursor(InputState *s);

@@ -1,4 +1,17 @@
 #include "handle_mu.h"
+#include "icons/check.h"
+#include "icons/close.h"
+#include "icons/collapsed.h"
+#include "icons/expanded.h"
+#include "intraFont.h"
+#include "util.h"
+
+#define SET_ICON(icon_type)                                                    \
+    do {                                                                       \
+        w = w_##icon_type##_ATL;                                               \
+        h = h_##icon_type##_ATL;                                               \
+        icon = icon_type##_ATL;                                                \
+    } while (0)
 
 void handle_mu_text(intraFont *fnt, mu_Command *cmd) {
     mu_Color c = cmd->text.color;
@@ -14,7 +27,7 @@ void handle_mu_rect(mu_Command *cmd) {
 
 void handle_mu_icon(mu_Command *cmd) {
     int w, h;
-    uint8_t *icon = NULL;
+    const uint8_t *icon = NULL;
     switch (cmd->icon.id) {
     case MU_ICON_CHECK: {
         SET_ICON(MU_ICON_CHECK);
