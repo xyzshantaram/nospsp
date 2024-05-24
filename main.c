@@ -211,30 +211,40 @@ int process_controls(mu_Context *ctx, InputState *s) {
     ret = sceCtrlReadBufferPositive(&data, 1);
     if (ret < 0) goto exit;
 
-    int dx = mouse_get_delta(data.Lx);
-    int dy = mouse_get_delta(data.Ly);
-    if (!(data.Buttons & PSP_CTRL_TRIANGLE)) {
-        s->mouse_x += dx;
-        s->mouse_y += dy;
-        s->mouse_x = CLAMP(s->mouse_x, 0, PSP_SCR_WIDTH);
-        s->mouse_y = CLAMP(s->mouse_y, 0, PSP_SCR_HEIGHT);
+    int handled_select = 0;
+    if (!handled_select && latch.uiBreak & PSP_CTRL_SELECT) {
+        is_keyboard_active = !is_keyboard_active;
+        handled_select = 1;
+    }
+
+    if (is_keyboard_active) {
+        render_keyboard(false, data.Lx, data.Ly);
     } else {
-        mu_input_scroll(ctx, dx, dy);
-    }
+        int dx = mouse_get_delta(data.Lx);
+        int dy = mouse_get_delta(data.Ly);
+        if (!(data.Buttons & PSP_CTRL_TRIANGLE)) {
+            s->mouse_x += dx;
+            s->mouse_y += dy;
+            s->mouse_x = CLAMP(s->mouse_x, 0, PSP_SCR_WIDTH);
+            s->mouse_y = CLAMP(s->mouse_y, 0, PSP_SCR_HEIGHT);
+        } else {
+            mu_input_scroll(ctx, dx, dy);
+        }
 
-    if (s->mouse_x != s->last_mouse_x || s->mouse_y != s->last_mouse_y) {
-        mu_input_mousemove(ctx, s->mouse_x, s->mouse_y);
-    }
+        if (s->mouse_x != s->last_mouse_x || s->mouse_y != s->last_mouse_y) {
+            mu_input_mousemove(ctx, s->mouse_x, s->mouse_y);
+        }
 
-    s->last_mouse_x = s->mouse_x;
-    s->last_mouse_y = s->mouse_y;
+        s->last_mouse_x = s->mouse_x;
+        s->last_mouse_y = s->mouse_y;
 
-    if (latch.uiBreak & PSP_CTRL_CROSS) {
-        mu_input_mouseup(ctx, s->mouse_x, s->mouse_y, MU_MOUSE_LEFT);
-    }
+        if (latch.uiBreak & PSP_CTRL_CROSS) {
+            mu_input_mouseup(ctx, s->mouse_x, s->mouse_y, MU_MOUSE_LEFT);
+        }
 
-    if (latch.uiMake & PSP_CTRL_CROSS) {
-        mu_input_mousedown(ctx, s->mouse_x, s->mouse_y, MU_MOUSE_LEFT);
+        if (latch.uiMake & PSP_CTRL_CROSS) {
+            mu_input_mousedown(ctx, s->mouse_x, s->mouse_y, MU_MOUSE_LEFT);
+        }
     }
 
 exit:
