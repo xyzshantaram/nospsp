@@ -26,7 +26,7 @@
 
 PSP_MODULE_INFO("NostrStation Portable", 0, 1, 1);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
-PSP_MAIN_THREAD_STACK_SIZE_KB(1024);
+PSP_MAIN_THREAD_STACK_SIZE_KB(3072);
 PSP_HEAP_SIZE_KB(-4096);
 
 static void ConfigureDialog(pspUtilityDialogCommon *dialog,
