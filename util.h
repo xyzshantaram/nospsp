@@ -22,4 +22,5 @@ _Bool circle_rect_collision(int cx, int cy, int r, int rx, int ry, int w,
                             int h);
 void load_latin_font(intraFont **fnt, int idx);
 void unload_font(intraFont **fnt);
+void draw_line(int x0, int y0, int x1, int y1, g2dColor color);
 #endif

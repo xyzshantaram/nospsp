@@ -1,4 +1,5 @@
 #include "util.h"
+#include "glib2d.h"
 #include "intraFont.h"
 #include <math.h>
 #include <stdio.h>
@@ -25,7 +26,22 @@ void fill_rect(int x, int y, int w, int h, g2dColor color) {
     g2dEnd();
 }
 
-void stroke_rect(int x, int y, int w, int h, g2dColor color) {}
+void draw_line(int x0, int y0, int x1, int y1, g2dColor color) {
+    g2dBeginLines(G2D_STRIP);
+    g2dSetColor(color);
+    g2dSetCoordXY(x0, y0);
+    g2dAdd();
+    g2dSetCoordXY(x1, y1);
+    g2dAdd();
+    g2dEnd();
+}
+
+void stroke_rect(int x, int y, int w, int h, g2dColor color) {
+    draw_line(x, y, x + w, y, color);
+    draw_line(x, y, x, y + h, color);
+    draw_line(x + w, y, x + w, y + h, color);
+    draw_line(x, y + h, x + w, y + h, color);
+}
 
 void fill_circle(int cx, int cy, int r, g2dColor color) {
     g2dBeginPoints();
