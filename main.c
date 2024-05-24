@@ -127,6 +127,81 @@ int mouse_get_delta(uint8_t axis) {
     return distance_without_deadzone / MOUSE_SPEED_MODIFIER;
 }
 
+bool is_keyboard_active = false;
+
+// clang-format off
+char keymaps[3][3][4] = {
+{
+    {' ', '-', '!', '?'}, 
+    {'y', 'c', 'b', 'p'}, 
+    {'@', '$', '(', ')'}
+    },
+{
+    {'r', 'd', 'l', 'u'}, 
+    {'e', 't', 'a', 'o'}, 
+    {'m', 'w', 'f', 'g'}
+    },
+{
+    {'k', 'v', 'j', 'x'}, 
+    {'i', 'n', 's', 'h'}, 
+    {'z', 'q', '.', ','}
+    }
+};
+
+// clang-format on
+
+#define CH_TO_STR(x) ((char[2]){x, '\0'})
+void render_keyboard(bool shifted, uint8_t lx, uint8_t ly) {
+    uint32_t bg = 0x99eeeeee;
+    uint32_t black = 0xff000000;
+    uint32_t gray = 0xff202020;
+    uint32_t bg_brighter = 0xffffffff;
+    int x = 124;
+    int y = 20;
+    int side = 232;
+    int side_b3 = side / 3;
+    int side_2b3 = 2 * side / 3;
+
+    fill_rect(x, y, side, side, bg);
+    fill_rect(x, y, side, side, bg);
+
+    int tx = ((float)lx / 255) * side;
+    int ty = ((float)ly / 255) * side;
+
+    int qx = tx < side_b3 ? 0 : (tx > side_2b3 ? 2 : 1);
+    int qy = ty < side_b3 ? 0 : (ty > side_2b3 ? 2 : 1);
+
+    fill_rect(x + qx * side_b3, y + qy * side_b3, side / 3, side / 3,
+              bg_brighter);
+
+    draw_line(x, y + side_b3, x + side, y + side_b3, black);
+    draw_line(x, y + side_2b3, x + side, y + side_2b3, black);
+    draw_line(x + side_b3, y, x + side_b3, y + side, black);
+    draw_line(x + side_2b3, y, x + side_2b3, y + side, black);
+
+    int offset_half = side_b3 / 2 - 8;
+    int offset_full = side_b3 - 15;
+    float size = 0.8f;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            int xpos = x + i * side_b3 + 4;
+            int ypos = y + j * side_b3 + 12;
+            int color = 0xff555555;
+            if (qx == i && qy == j) color = BLACK;
+            char *keys = keymaps[i][j];
+
+            iF_draw_text(xpos + offset_half, ypos + offset_full,
+                         CH_TO_STR(keys[0]), color, 0.8f);
+            iF_draw_text(xpos, ypos + offset_half, CH_TO_STR(keys[1]), color,
+                         0.8f);
+            iF_draw_text(xpos + offset_half, ypos, CH_TO_STR(keys[2]), color,
+                         0.8f);
+            iF_draw_text(xpos + offset_full, ypos + offset_half,
+                         CH_TO_STR(keys[3]), color, 0.8f);
+        }
+    }
+}
+
 int process_controls(mu_Context *ctx, InputState *s) {
     SceCtrlLatch latch;
     int ret = sceCtrlReadLatch(&latch);
