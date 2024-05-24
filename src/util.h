@@ -35,6 +35,7 @@ void unload_font(intraFont **fnt);
 void draw_line(int x0, int y0, int x1, int y1, g2dColor color);
 void iF_draw_text(intraFont *fnt, float xpos, float ypos, const char *msg,
                   uint32_t color, float size);
-void draw_icon(uint8_t *icon, int x, int y, uint8_t w, uint8_t h, mu_Color c);
+void draw_icon(const uint8_t *icon, int x, int y, uint8_t w, uint8_t h,
+               mu_Color c);
 
 #endif

@@ -95,7 +95,8 @@ void stroke_circle(int cx, int cy, int r, g2dColor color) {
     g2dEnd();
 }
 
-void draw_icon(uint8_t *icon, int x, int y, uint8_t w, uint8_t h, mu_Color c) {
+void draw_icon(const uint8_t *icon, int x, int y, uint8_t w, uint8_t h,
+               mu_Color c) {
     g2dBeginPoints();
     for (int i = 0; i < w; i++) {
         for (int j = 0; j < h; j++) {
