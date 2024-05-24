@@ -1,5 +1,5 @@
-#ifndef __UTIL_H__
-#define __UTIL_H__
+#ifndef __UTIL_H
+#define __UTIL_H
 
 #include "glib2d.h"
 #include "intraFont.h"

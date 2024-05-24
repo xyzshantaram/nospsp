@@ -1,7 +1,10 @@
-#include "icons/check.c"
-#include "icons/close.c"
-#include "icons/collapsed.c"
-#include "icons/expanded.c"
+#ifndef __HANDLE_MU_H
+#define __HANDLE_MU_H
+
+#include "icons/check.h"
+#include "icons/close.h"
+#include "icons/collapsed.h"
+#include "icons/expanded.h"
 #include "microui.h"
 #include "util.h"
 
@@ -15,3 +18,4 @@ void handle_mu_icon(mu_Command *cmd);
         h = h_##icon_type##_ATL;                                               \
         icon = icon_type##_ATL;                                                \
     } while (0)
+#endif

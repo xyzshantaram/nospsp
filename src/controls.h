@@ -1,3 +1,5 @@
+#ifndef __CONTROLS_H
+#define __CONTROLS_H
 
 #include "microui.h"
 #include "util.h"
@@ -38,3 +40,5 @@ char keymaps[3][3][4] = {
 
 int process_controls(mu_Context *ctx, InputState *s, intraFont *fnt);
 void draw_cursor(InputState *s);
+
+#endif

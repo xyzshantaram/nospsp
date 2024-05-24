@@ -1,5 +1,5 @@
 #include "controls.h"
-#include "icons/cursor.c"
+#include "icons/cursor.h"
 #include "util.h"
 
 void draw_cursor(InputState *s) {

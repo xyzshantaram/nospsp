@@ -1,3 +1,6 @@
+#ifndef __NET_H
+#define __NET_H
+
 #include "net.h"
 #include <pspnet.h>
 #include <pspnet_inet.h>
@@ -94,3 +97,5 @@ net_failed:
 
     return 0;
 }
+
+#endif
