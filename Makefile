@@ -1,10 +1,10 @@
 TARGET = NostrPSP
 BUILD_PRX = 1
 
-OBJS = main.o glib2d.o callbacks.o util.o microui.o
+OBJS = main.o glib2d.o callbacks.o util.o microui.o wic/src/http_parser.o wic/src/wic.o
 LIBS = -lm -ljpeg -lpng -lz -lintrafont_psp -lpspgum -lpspgu -lpsprtc -lpspvram -lpspnet -lpspnet_apctl
 
-CFLAGS = -O2 -G0 -Wall
+CFLAGS = -O2 -G0 -Wall -I wic/include
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 

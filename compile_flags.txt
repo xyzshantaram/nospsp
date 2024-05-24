@@ -11,3 +11,5 @@
 /usr/local/pspdev/psp/lib
 -I
 /usr/local/pspdev/lib
+-I
+./wic/include

@@ -8,7 +8,9 @@
 #include "intraFont.h"
 #include "microui.h"
 #include "util.h"
+#include "wic/include/wic.h"
 #include <pspctrl.h>
+#include <pspge.h>
 #include <pspmoduleinfo.h>
 #include <pspnet.h>
 #include <pspnet_apctl.h>
@@ -123,7 +125,6 @@ int mouse_get_delta(uint8_t axis) {
     if (delta_val > -MOUSE_DEADZONE && delta_val < MOUSE_DEADZONE) {
         distance_without_deadzone = 0;
     }
-
     return distance_without_deadzone / MOUSE_SPEED_MODIFIER;
 }
 
@@ -357,7 +358,7 @@ void mu_demo(mu_Context *ctx) {
 void handle_mu_text(mu_Command *cmd) {
     mu_Color c = cmd->text.color;
     iF_draw_text(cmd->text.pos.x, cmd->text.pos.y + 4, cmd->text.str,
-                 G2D_RGBA(c.r, c.g, c.b, c.a));
+                 G2D_RGBA(c.r, c.g, c.b, c.a), 0.6f);
 }
 
 void handle_mu_rect(mu_Command *cmd) {
@@ -413,7 +414,6 @@ void mainloop(GameState *state, InputState *s, mu_Context *ctx) {
     mu_Command *cmd = NULL;
     g2dClear(G2D_HEX(0x007cdfff));
     mu_begin(ctx);
-    process_controls(ctx, s);
     mu_demo(ctx);
     mu_end(ctx);
 
@@ -439,6 +439,7 @@ void mainloop(GameState *state, InputState *s, mu_Context *ctx) {
     }
 
     draw_cursor(s);
+    process_controls(ctx, s);
     g2dFlip(G2D_VSYNC);
 }
 
