@@ -1,6 +1,7 @@
 #include "util.h"
 #include "glib2d.h"
 #include "intraFont.h"
+#include "microui.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -90,6 +91,19 @@ void stroke_circle(int cx, int cy, int r, g2dColor color) {
             p += 2 * (x - y) + 1;
         }
         circle_points(cx, cy, x, y, color);
+    }
+    g2dEnd();
+}
+
+void draw_icon(uint8_t *icon, int x, int y, uint8_t w, uint8_t h, mu_Color c) {
+    g2dBeginPoints();
+    for (int i = 0; i < w; i++) {
+        for (int j = 0; j < h; j++) {
+            int b = icon[i + w * j];
+            add_point(x + i + w / 4, y + j + h / 4,
+                      G2D_RGBA((c.r * b) / 0xff, (c.g * b) / 0xff,
+                               (c.b * b) / 0xff, (c.a * b) / 0xff));
+        }
     }
     g2dEnd();
 }
