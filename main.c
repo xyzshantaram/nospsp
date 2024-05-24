@@ -44,6 +44,15 @@ static void ConfigureDialog(pspUtilityDialogCommon *dialog,
     dialog->soundThread = 0x10;
 }
 
+intraFont *fnt;
+
+void iF_draw_text(float xpos, float ypos, const char *msg, uint32_t color,
+                  float size) {
+    if (!msg) return;
+    intraFontSetStyle(fnt, size, color, 0, 0.0f, 0);
+    intraFontPrint(fnt, xpos, ypos, msg);
+}
+
 int psp_DisplayNetDialog(void) {
     int ret = 0, done = 0;
     pspUtilityNetconfData data;
@@ -191,14 +200,6 @@ typedef enum game_state_t {
     GS_EXITED = 0,
     GS_RUNNING,
 } GameState;
-
-intraFont *fnt;
-
-void iF_draw_text(float xpos, float ypos, const char *msg, uint32_t color) {
-    if (!msg) return;
-    intraFontSetStyle(fnt, 0.6f, color, 0, 0.0f, 0);
-    intraFontPrint(fnt, xpos, ypos, msg);
-}
 
 static int text_width(mu_Font fnt, const char *text, int len) {
     if (len == -1) {
