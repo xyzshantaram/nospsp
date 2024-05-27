@@ -22,6 +22,11 @@ typedef enum game_state_t {
     GS_RUNNING,
 } GameState;
 
+typedef struct net_state_t {
+    char *logbuf;
+    int buf_updated;
+} NetState;
+
 int clamp(int val, int min, int max);
 void fill_rect(int x, int y, int w, int h, g2dColor color);
 void stroke_rect(int x, int y, int w, int h, g2dColor color);
