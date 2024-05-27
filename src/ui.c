@@ -1,5 +1,6 @@
 
 #include "ui.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 static int uint8_slider(mu_Context *ctx, unsigned char *value, int low,
@@ -13,37 +14,19 @@ static int uint8_slider(mu_Context *ctx, unsigned char *value, int low,
     return res;
 }
 
-void mu_demo(mu_Context *ctx) {
-    static struct {
-        const char *label;
-        int idx;
-    } colors[] = {{"text:", MU_COLOR_TEXT},
-                  {"border:", MU_COLOR_BORDER},
-                  {"windowbg:", MU_COLOR_WINDOWBG},
-                  {"titlebg:", MU_COLOR_TITLEBG},
-                  {"titletext:", MU_COLOR_TITLETEXT},
-                  {"panelbg:", MU_COLOR_PANELBG},
-                  {"button:", MU_COLOR_BUTTON},
-                  {"buttonhover:", MU_COLOR_BUTTONHOVER},
-                  {"buttonfocus:", MU_COLOR_BUTTONFOCUS},
-                  {"base:", MU_COLOR_BASE},
-                  {"basehover:", MU_COLOR_BASEHOVER},
-                  {"basefocus:", MU_COLOR_BASEFOCUS},
-                  {"scrollbase:", MU_COLOR_SCROLLBASE},
-                  {"scrollthumb:", MU_COLOR_SCROLLTHUMB},
-                  {NULL}};
-
-    if (mu_begin_window(ctx, "Style Editor", mu_rect(0, 0, 480, 272))) {
-        int sw = mu_get_current_container(ctx)->body.w * 0.14;
-        mu_layout_row(ctx, 6, (int[]){80, sw, sw, sw, sw, -1}, 0);
-        for (int i = 0; colors[i].label; i++) {
-            mu_label(ctx, colors[i].label);
-            uint8_slider(ctx, &ctx->style->colors[i].r, 0, 255);
-            uint8_slider(ctx, &ctx->style->colors[i].g, 0, 255);
-            uint8_slider(ctx, &ctx->style->colors[i].b, 0, 255);
-            uint8_slider(ctx, &ctx->style->colors[i].a, 0, 255);
-            mu_draw_rect(ctx, mu_layout_next(ctx), ctx->style->colors[i]);
+void mu_demo(mu_Context *ctx, char **logbuf, int *buf_updated) {
+    if (mu_begin_window(ctx, "HTTPS?", mu_rect(0, 0, 480, 272))) {
+        mu_layout_row(ctx, 1, (int[]){-1}, -1);
+        mu_begin_panel(ctx, "Log Output");
+        mu_Container *panel = mu_get_current_container(ctx);
+        mu_layout_row(ctx, 1, (int[]){-1}, -1);
+        mu_text(ctx, *logbuf);
+        mu_end_panel(ctx);
+        if (*buf_updated) {
+            panel->scroll.y = panel->content_size.y;
+            *buf_updated = 0;
         }
+
         mu_end_window(ctx);
     }
 }
